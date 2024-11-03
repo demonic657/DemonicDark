@@ -1,0 +1,566 @@
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/REDzHUB/LibraryV2/main/redzLib")))()
+
+MakeWindow({
+  Hub = {
+    Title = "DemonicHub",
+    Animation = "by : DemonicOfficial"
+  },
+  
+  Key = {
+    KeySystem = false,
+    Title = "Key System",
+    Description = "",
+    KeyLink = "",
+    Keys = {"D4rk"},
+    Notifi = {
+      Notifications = true,
+      CorrectKey = "Running the Script...",
+      Incorrectkey = "The key is incorrect",
+      CopyKeyLink = ""
+    }
+  }
+})
+  
+  local Main = MakeTab({Name = "Main"})
+  
+  MakeNotifi({
+  Title = "Credit to Demonic_Official",
+  Text = "script running!!",
+  Time = 5
+})
+
+AddButton(Main, {
+  Name = "No Cooldown",
+  Callback = function()g = hookfunction(wait, function(seconds)
+return g(0)
+end)
+
+  end
+})
+
+AddButton(Main, {
+  Name = "Silent Aim",
+  Callback = function()local fov = 30
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local Cam = game.Workspace.CurrentCamera
+ 
+local FOVring = Drawing.new("Circle")
+FOVring.Visible = true
+FOVring.Thickness = 2
+FOVring.Color = Color3.fromRGB(128, 0, 128) -- Purple color
+FOVring.Filled = false
+FOVring.Radius = fov
+FOVring.Position = Cam.ViewportSize / 2
+ 
+local function updateDrawings()
+    local camViewportSize = Cam.ViewportSize
+    FOVring.Position = camViewportSize / 2
+end
+ 
+local function onKeyDown(input)
+    if input.KeyCode == Enum.KeyCode.Delete then
+        RunService:UnbindFromRenderStep("FOVUpdate")
+        FOVring:Remove()
+    end
+end
+ 
+UserInputService.InputBegan:Connect(onKeyDown)
+ 
+local function lookAt(target)
+    local lookVector = (target - Cam.CFrame.Position).unit
+    local newCFrame = CFrame.new(Cam.CFrame.Position, Cam.CFrame.Position + lookVector)
+    Cam.CFrame = newCFrame
+end
+ 
+local function getClosestPlayerInFOV(trg_part)
+    local nearest = nil
+    local last = math.huge
+    local playerMousePos = Cam.ViewportSize / 2
+ 
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= Players.LocalPlayer then
+            local part = player.Character and player.Character:FindFirstChild(trg_part)
+            if part then
+                local ePos, isVisible = Cam:WorldToViewportPoint(part.Position)
+                local distance = (Vector2.new(ePos.x, ePos.y) - playerMousePos).Magnitude
+ 
+                if distance < last and isVisible and distance < fov then
+                    last = distance
+                    nearest = player
+                end
+            end
+        end
+    end
+ 
+    return nearest
+end
+ 
+RunService.RenderStepped:Connect(function()
+    updateDrawings()
+    local closest = getClosestPlayerInFOV("Head")
+    if closest and closest.Character:FindFirstChild("Head") then
+        lookAt(closest.Character.Head.Position)
+    end
+end)
+   
+  end
+})
+
+AddTextBox(Main,{
+  Name = "Hitbox",
+  Default = "",
+  PlaceholderText = "Value",
+  ClearText = true,
+  Callback = function(value)
+    _G.HeadSize = value
+_G.Disabled = true
+ 
+game:GetService('RunService').RenderStepped:connect(function()
+if _G.Disabled then
+for i,v in next, game:GetService('Players'):GetPlayers() do
+if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+pcall(function()
+v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize,_G.HeadSize,_G.HeadSize)
+v.Character.HumanoidRootPart.Transparency = 0.7
+v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really white")
+v.Character.HumanoidRootPart.Material = "Neon"
+v.Character.HumanoidRootPart.CanCollide = false
+end)
+end
+end
+end
+end)
+      end
+})
+
+local Main = MakeTab({Name = "Esp"})
+
+AddButton(Main, {
+  Name = "Esp",
+  Callback = function()local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+local Settings = {
+    ESP_Enabled = true,
+    ESP_TeamCheck = false,
+    Chams = true,
+    Chams_Color = Color3.fromRGB(0, 0, 255),
+    Chams_Transparency = 0.9,
+    Chams_Glow_Color = Color3.fromRGB(255, 0, 0),
+    Glow_Transparency = 0.3
+}
+
+local function DestroyChams(character)
+    for _, part in ipairs(character:GetChildren()) do
+        if part:IsA("BasePart") and part.Transparency ~= 1 then
+            local glow = part:FindFirstChild("Glow")
+            local chams = part:FindFirstChild("Chams")
+
+            if glow then glow:Destroy() end
+            if chams then chams:Destroy() end
+        end
+    end
+end
+
+RunService.Heartbeat:Connect(function()
+    if Settings.ESP_Enabled then
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local humanoid = player.Character:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    if not (Settings.ESP_TeamCheck and player.Team == LocalPlayer.Team) then
+                        local character = player.Character
+
+                        for _, part in ipairs(character:GetChildren()) do
+                            if part:IsA("BasePart") and part.Transparency ~= 1 then
+                                if Settings.Chams then
+                                    if not part:FindFirstChild("Glow") and not part:FindFirstChild("Chams") then
+                                        local chamsBox = Instance.new("BoxHandleAdornment", part)
+                                        chamsBox.Name = "Chams"
+                                        chamsBox.AlwaysOnTop = true
+                                        chamsBox.ZIndex = 4
+                                        chamsBox.Adornee = part
+                                        chamsBox.Color3 = Settings.Chams_Color
+                                        chamsBox.Transparency = Settings.Chams_Transparency
+                                        chamsBox.Size = part.Size + Vector3.new(0.02, 0.02, 0.02)
+
+                                        local glowBox = Instance.new("BoxHandleAdornment", part)
+                                        glowBox.Name = "Glow"
+                                        glowBox.AlwaysOnTop = false
+                                        glowBox.ZIndex = 3
+                                        glowBox.Adornee = part
+                                        glowBox.Color3 = Settings.Chams_Glow_Color
+                                        glowBox.Size = chamsBox.Size + Vector3.new(0.13, 0.13, 0.13)
+                                        glowBox.Transparency = Settings.Glow_Transparency
+                                    end
+                                else
+                                    DestroyChams(character)
+                                end
+                            end
+                        end
+                    else
+                        DestroyChams(player.Character)
+                    end
+                else
+                    DestroyChams(player.Character)
+                end
+            end
+        end
+    else
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local humanoid = player.Character:FindFirstChild("Humanoid")
+                if humanoid and humanoid.Health > 0 then
+                    DestroyChams(player.Character)
+                end
+            end
+        end
+    end
+end)
+  
+  end
+})
+  
+local Main = MakeTab({Name = "Character"})
+  
+AddButton(Main, {
+  Name = "Invisible",
+  Callback = function()loadstring(game:HttpGet('https://pastebin.com/raw/3Rnd9rHf'))()
+  
+  end
+})
+  
+AddButton(Main, {
+  Name = "Dash",
+  Callback = function()loadstring(game:HttpGet('https://raw.githubusercontent.com/Mautiku/ehh/main/FE%20DASH.txt'))()
+  
+  end
+})
+  
+AddButton(Main, {
+  Name = "Godmode",
+  Callback = function()loadstring(game:HttpGet("https://raw.githubusercontent.com/zephyr10101/ignore-touchinterests/main/main",true))()
+  
+  end
+})
+  
+AddButton(Main, {
+  Name = "Korblox",
+  Callback = function()local char = game:GetService("Players").LocalPlayer.Character
+
+char.RightFoot.MeshId = "http://www.roblox.com/asset/?id=902942089"
+char.RightFoot.Transparency = 1
+char.RightLowerLeg.MeshId = "http://www.roblox.com/asset/?id=902942093"
+char.RightLowerLeg.Transparency = 1
+char.RightUpperLeg.MeshId = "http://www.roblox.com/asset/?id=902942096"
+char.RightUpperLeg.TextureID = "http://roblox.com/asset/?id=902843398"
+  
+  end
+})
+
+local Main = MakeTab({Name = "Settings"})
+
+AddButton(Main, {
+  Name = "Shiftlock(For Games that Doesn't Have)",
+  Callback = function()local UserInputService = game:GetService("UserInputService")
+
+if not UserInputService.TouchEnabled then
+    return
+end
+
+local ShiftlockStarterGui = Instance.new("ScreenGui")
+local ImageButton = Instance.new("ImageButton")
+local SetPositionButton = Instance.new("TextButton")
+
+ShiftlockStarterGui.Name = "ShiftlockStarterGui"
+ShiftlockStarterGui.Parent = game.CoreGui
+ShiftlockStarterGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ShiftlockStarterGui.ResetOnSpawn = false
+
+ImageButton.Parent = ShiftlockStarterGui
+ImageButton.Active = true
+ImageButton.Draggable = true
+ImageButton.BackgroundTransparency = 1.000
+ImageButton.Size = UDim2.new(0, 50, 0, 50)
+ImageButton.Image = "rbxasset://textures/ui/mouseLock_off@2x.png"
+ImageButton.Visible = true
+ImageButton.Position = UDim2.new(0.5, -25, 0.5, -25)
+
+SetPositionButton.Parent = ShiftlockStarterGui
+SetPositionButton.Size = UDim2.new(0, 100, 0, 40)
+SetPositionButton.Position = UDim2.new(0.5, -50, 0, 10)
+SetPositionButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+SetPositionButton.BorderSizePixel = 0
+SetPositionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+SetPositionButton.TextSize = 14
+SetPositionButton.Font = Enum.Font.GothamBold
+SetPositionButton.Text = "Set Position"
+SetPositionButton.TextStrokeTransparency = 0.5
+
+local uiCornerSetPosition = Instance.new("UICorner", SetPositionButton)
+uiCornerSetPosition.CornerRadius = UDim.new(0.5, 0)
+
+local uiStrokeSetPosition = Instance.new("UIStroke", SetPositionButton)
+uiStrokeSetPosition.Thickness = 2
+uiStrokeSetPosition.Color = Color3.fromRGB(255, 255, 255)
+uiStrokeSetPosition.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+local function SetPosition()
+    ImageButton.Draggable = false
+    SetPositionButton:Destroy()
+end
+
+SetPositionButton.TouchTap:Connect(SetPosition)
+
+local function ShiftLockScript()
+    local script = Instance.new('LocalScript', ImageButton)
+    local players = game:GetService("Players")
+    local runservice = game:GetService("RunService")
+    local player = players.LocalPlayer
+    local camera = workspace.CurrentCamera
+    local button = script.Parent
+    local states = {
+        OFF = "rbxasset://textures/ui/mouseLock_off@2x.png",
+        ON = "rbxasset://textures/ui/mouseLock_on@2x.png"
+    }
+    local active = false
+
+    local function UpdateImage(state)
+        button.Image = states[state]
+    end
+
+    local function AlignCharacterWithCamera()
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local rootPart = character.HumanoidRootPart
+            local cameraCFrame = camera.CFrame
+            local lookVector = cameraCFrame.LookVector
+            rootPart.CFrame = CFrame.new(rootPart.Position, rootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
+        end
+    end
+
+    local function EnableShiftlock()
+        AlignCharacterWithCamera()
+        UpdateImage("ON")
+        if not active then
+            active = runservice.RenderStepped:Connect(function()
+                AlignCharacterWithCamera()
+            end)
+        end
+    end
+
+    local function DisableShiftlock()
+        UpdateImage("OFF")
+        if active then
+            active:Disconnect()
+            active = nil
+        end
+    end
+
+    UpdateImage("OFF")
+
+    button.TouchTap:Connect(function()
+        if not active then
+            EnableShiftlock()
+        else
+            DisableShiftlock()
+        end
+    end)
+end
+
+ShiftLockScript()
+
+local function PositionShiftLockButton()
+    local script = Instance.new('LocalScript', ShiftlockStarterGui)
+    local playerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local chatGui = playerGui:WaitForChild("Chat")
+    local button = script.Parent:WaitForChild("ImageButton")
+
+    local function updatePosition()
+        local textBoxIcon = chatGui:FindFirstChild("TextBox") or chatGui:FindFirstChild("ChatBar")
+        if textBoxIcon and textBoxIcon.AbsolutePosition then
+            button.Position = UDim2.new(0, textBoxIcon.AbsolutePosition.X + textBoxIcon.AbsoluteSize.X + 10, 0, textBoxIcon.AbsolutePosition.Y)
+        end
+    end
+
+    chatGui:GetPropertyChangedSignal("AbsolutePosition"):Connect(updatePosition)
+    chatGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(updatePosition)
+    playerGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(updatePosition)
+    
+    updatePosition()
+end
+
+PositionShiftLockButton()
+  
+  end
+})
+
+AddButton(Main, {
+  Name = "Shiftlock(permanent)",
+  Callback = function()local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+ 
+local function MakeDraggable(topbarobject, object)
+    local Dragging = nil
+    local DragInput = nil
+    local DragStart = nil
+    local StartPosition = nil
+    
+    local function Update(input)
+        local Delta = input.Position - DragStart
+        local pos = UDim2.new(StartPosition.X.Scale, StartPosition.X.Offset + Delta.X, StartPosition.Y.Scale, StartPosition.Y.Offset + Delta.Y)
+        local Tween = TweenService:Create(object, TweenInfo.new(0.15), {
+            Position = pos
+        })
+        Tween:Play()
+    end
+    
+    topbarobject.InputBegan:Connect(
+        function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                Dragging = true
+                DragStart = input.Position
+                StartPosition = object.Position
+                
+                input.Changed:Connect(
+                    function()
+                        if input.UserInputState == Enum.UserInputState.End then
+                            Dragging = false
+                        end
+                    end
+                )
+            end
+        end
+    )
+    
+    topbarobject.InputChanged:Connect(
+        function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                DragInput = input
+            end
+        end
+    )
+    
+    UserInputService.InputChanged:Connect(
+        function(input)
+            if input == DragInput and Dragging then
+                Update(input)
+            end
+        end
+    )
+end
+
+local ShiftLockScreenGui = Instance.new("ScreenGui")
+local ShiftLockButton = Instance.new("ImageButton")
+local ShiftlockCursor = Instance.new("ImageLabel")
+local CoreGui = game:GetService("CoreGui")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local ContextActionService = game:GetService("ContextActionService")
+local Player = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local States = {
+    Off = "rbxasset://textures/ui/mouseLock_off@2x.png",
+    On = "rbxasset://textures/ui/mouseLock_on@2x.png",
+    Lock = "rbxasset://textures/MouseLockedCursor.png",
+    Lock2 = "rbxasset://SystemCursors/Cross"
+}
+local MaxLength = 900000
+local EnabledOffset = CFrame.new(1.7, 0, 0)
+local DisabledOffset = CFrame.new(-1.7, 0, 0)
+local Active
+
+ShiftLockScreenGui.Name = "Shiftlock (CoreGui)"
+ShiftLockScreenGui.Parent = CoreGui
+ShiftLockScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ShiftLockScreenGui.ResetOnSpawn = false
+
+ShiftLockButton.Parent = ShiftLockScreenGui
+ShiftLockButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+ShiftLockButton.BackgroundTransparency = 1.000
+ShiftLockButton.Position = UDim2.new(0.7, 0, 0.75, 0)
+ShiftLockButton.Size = UDim2.new(0.0636147112, 0, 0.0661305636, 0)
+ShiftLockButton.SizeConstraint = Enum.SizeConstraint.RelativeXX
+ShiftLockButton.Image = States.Off
+
+ShiftlockCursor.Name = "Shiftlock Cursor"
+ShiftlockCursor.Parent = ShiftLockScreenGui
+ShiftlockCursor.Image = States.Lock
+ShiftlockCursor.Size = UDim2.new(0.03, 0, 0.03, 0)
+ShiftlockCursor.Position = UDim2.new(0.5, 0, 0.5, 0)
+ShiftlockCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+ShiftlockCursor.SizeConstraint = Enum.SizeConstraint.RelativeXX
+ShiftlockCursor.BackgroundTransparency = 1
+ShiftlockCursor.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+ShiftlockCursor.Visible = false
+
+MakeDraggable(ShiftLockButton, ShiftLockButton) -- Making the button draggable
+
+ShiftLockButton.MouseButton1Click:Connect(
+    function()
+        if not Active then
+            Active =
+                RunService.RenderStepped:Connect(
+                function()
+                    Player.Character.Humanoid.AutoRotate = false
+                    ShiftLockButton.Image = States.On
+                    ShiftlockCursor.Visible = true
+                    Player.Character.HumanoidRootPart.CFrame =
+                        CFrame.new(
+                        Player.Character.HumanoidRootPart.Position,
+                        Vector3.new(
+                            workspace.CurrentCamera.CFrame.LookVector.X * MaxLength,
+                            Player.Character.HumanoidRootPart.Position.Y,
+                            workspace.CurrentCamera.CFrame.LookVector.Z * MaxLength
+                        )
+                    )
+                    workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame * EnabledOffset
+                    workspace.CurrentCamera.Focus =
+                        CFrame.fromMatrix(
+                        workspace.CurrentCamera.Focus.Position,
+                        workspace.CurrentCamera.CFrame.RightVector,
+                        workspace.CurrentCamera.CFrame.UpVector
+                    ) * EnabledOffset
+                end
+            )
+        else
+            Player.Character.Humanoid.AutoRotate = true
+            ShiftLockButton.Image = States.Off
+            workspace.CurrentCamera.CFrame = workspace.CurrentCamera.CFrame * DisabledOffset
+            ShiftlockCursor.Visible = false
+            pcall(
+                function()
+                    Active:Disconnect()
+                    Active = nil
+                end
+            )
+        end
+    end
+)
+
+local ShiftLockAction = ContextActionService:BindAction("Shift Lock", ShiftLock, false, "On")
+ContextActionService:SetPosition("Shift Lock", UDim2.new(0.8, 0, 0.8, 0))
+
+return {} and ShiftLockAction
+  
+  end
+})
+
+AddButton(Main, {
+  Name = "Rejoin(Stay On the same server)",
+  Callback = function()loadstring(game:HttpGet("https://raw.githubusercontent.com/Jelly-plays/Rejoin-script/main/obf_L744By559M18BbuseSG6en8r1zL31daK9060LV7WyvmS4bQp92aONWfwRE36FdcZ.lua.txt"))();
+  
+  end
+})
+
+MinimizeButton({
+  Image = "rbxassetid://72161096187712",
+  Size = {60, 60},
+  Color = Color3.fromRGB(10, 10, 10),
+  Corner = true,
+  Stroke = false,
+  StrokeColor = Color3.fromRGB(255, 0, 0)
+})
